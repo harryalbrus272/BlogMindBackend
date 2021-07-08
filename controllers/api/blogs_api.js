@@ -2,7 +2,7 @@ const Blogs = require('../../models/Blogs');
 
 module.exports.list = async (req, res) => {
   try {
-    let blogs = await Blogs.find({});
+    let blogs = await Blogs.find({}).sort('-createdAt');
     return res.status(200).json({
       blogs,
       message: 'List of blogs',
@@ -45,28 +45,26 @@ module.exports.saveBlogs = async (req, res) => {
 };
 
 module.exports.blogDetails = async (req, res) => {
-  const { title, content } = req.body;
-  if (title && content) {
+  const { id } = req.params;
+  if (id) {
     try {
-      let result = await Blogs.create({
-        title,
-        content,
-      });
+      let result = await Blogs.findById(id);
       if (result)
         return res.status(200).json({
           success: true,
-          message: 'Order Created',
+          message: 'Blog Found',
           result,
         });
     } catch (error) {
       return res.status(500).json({
         message: 'Internal Server Error',
         success: false,
+        error,
       });
     }
   } else {
     return res.status(400).json({
-      message: 'Missing body parameters',
+      message: 'Blog Id not available in the params',
       success: false,
     });
   }
